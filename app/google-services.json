@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "65309485077",
+    "firebase_url": "https://geniusplazachatapp.firebaseio.com",
+    "project_id": "geniusplazachatapp",
+    "storage_bucket": "geniusplazachatapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65309485077:android:9b65f3e18ba2e77c",
+        "android_client_info": {
+          "package_name": "com.example.geniusplaza.geniusplazachatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "65309485077-dbbp0jhv1gjpaambrrjm3g3i18lj7ise.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.geniusplaza.geniusplazachatapp",
+            "certificate_hash": "cc8c3de449310084827ec8348e5acfab3d117522"
+          }
+        },
+        {
+          "client_id": "65309485077-45eg3g4uaiq11qadu7k2rjrj1d8cid6v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5CxR6oC7ZTqM3zZeLjqbPPQsyArzDAU0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "65309485077-45eg3g4uaiq11qadu7k2rjrj1d8cid6v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
