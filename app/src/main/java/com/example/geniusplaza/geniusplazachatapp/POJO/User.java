@@ -18,5 +18,6 @@ public class User {
         this.uid = uid;
         this.email = email;
         this.name = name;
+
     }
 }

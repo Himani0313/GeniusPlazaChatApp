@@ -1,5 +1,6 @@
 package com.example.geniusplaza.geniusplazachatapp;
 
+import android.content.Intent;
 import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +36,6 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
-        //getAllUsersFromFirebase();
         displayUsers();
     }
 
@@ -44,17 +45,31 @@ public class UserListActivity extends AppCompatActivity {
         adapter = new FirebaseListAdapter<User>(this, User.class,
                 R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("users")) {
             @Override
-            protected void populateView(View v, User model, int position) {
+            protected void populateView(View v, final User model, int position) {
                 // Get references to the views of message.xml
                 TextView userEmail = (TextView)v.findViewById(R.id.email_user);
-                if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) )
+                TextView userName = (TextView)v.findViewById(R.id.name_user);
+                if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) ){
                     userEmail.setText(model.email);
+                    userName.setText(model.name);
+                }
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(UserListActivity.this,UserToUserChatActivity.class);
+                        i.putExtra("userName",model.name);
+                        i.putExtra("email",model.email);
+                        i.putExtra("uid",model.uid);
+                        startActivity(i);
+                    }
+                });
 //                // Set their text
 //                userEmail.setText(model.getEmail());
             }
         };
-
+        Log.d("token id:", FirebaseInstanceId.getInstance().getToken());
         listOfUsers.setAdapter(adapter);
+
     }
     public void getAllUsersFromFirebase() {
         FirebaseDatabase.getInstance().getReference().child("users")
@@ -83,73 +98,3 @@ public class UserListActivity extends AppCompatActivity {
         });
     }
 }
-/*
-public class UserListActivity extends AppCompatActivity {
-
-    private static final String TAG = "UserList";
-    private DatabaseReference userlistReference;
-    private ValueEventListener mUserListListener;
-    ArrayList<String> usernamelist = new ArrayList<>();
-    ArrayAdapter arrayAdapter;
-
-    ListView userListView;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_list);
-        userlistReference = FirebaseDatabase.getInstance().getReference().child("users");
-        onStart();
-        userListView = (ListView) findViewById(R.id.list_of_users);
-
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        final ValueEventListener userListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                usernamelist = new ArrayList<>((ArrayList) dataSnapshot.getValue());
-                usernamelist.remove(usernameOfCurrentUser());
-                Log.i(TAG, "onDataChange: " + usernamelist.toString());
-                arrayAdapter = new ArrayAdapter(UserListActivity.this, android.R.layout.simple_list_item_1, usernamelist);
-                userListView.setAdapter(arrayAdapter);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "onCancelled: ", databaseError.toException());
-                Toast.makeText(UserListActivity.this, "Failed to load User list.",
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-        userlistReference.addValueEventListener(userListener);
-
-        mUserListListener = userListener;
-    }
-
-    public String usernameOfCurrentUser() {
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        if (email.contains("@")) {
-            return email.split("@")[0];
-        } else {
-            return email;
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // Remove post value event listener
-        if (mUserListListener != null) {
-            userlistReference.removeEventListener(mUserListListener);
-        }
-
-    }
-
-
-}*/
