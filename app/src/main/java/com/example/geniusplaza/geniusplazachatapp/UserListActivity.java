@@ -23,6 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,6 +52,7 @@ public class UserListActivity extends AppCompatActivity {
                 // Get references to the views of message.xml
                 TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                 TextView userName = (TextView)v.findViewById(R.id.name_user);
+//                FirebaseMessaging.getInstance().send(RemoteMessage );
                 if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) ){
                     userEmail.setText(model.email);
                     userName.setText(model.name);
@@ -60,6 +64,7 @@ public class UserListActivity extends AppCompatActivity {
                         i.putExtra("userName",model.name);
                         i.putExtra("email",model.email);
                         i.putExtra("uid",model.uid);
+                        i.putExtra("token",model.fireBaseToken);
                         startActivity(i);
                     }
                 });

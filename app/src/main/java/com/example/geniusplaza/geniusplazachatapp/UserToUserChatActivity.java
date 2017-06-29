@@ -13,4 +13,5 @@ public class UserToUserChatActivity extends AppCompatActivity {
         String userName = bundle.getString("userName");
         setTitle(userName);
     }
+
 }

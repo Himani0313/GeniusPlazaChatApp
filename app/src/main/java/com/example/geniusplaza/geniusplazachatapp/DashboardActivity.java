@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class DashboardActivity extends AppCompatActivity {
     int SIGN_IN_REQUEST_CODE = 100;
@@ -59,7 +60,7 @@ public class DashboardActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG)
                         .show();
                 mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-                User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),FirebaseAuth.getInstance().getCurrentUser().getEmail(),FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),FirebaseAuth.getInstance().getCurrentUser().getEmail(),FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseInstanceId.getInstance().getToken());
                 mDatabaseReference.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
                 //displayChatMessages();
             } else {
