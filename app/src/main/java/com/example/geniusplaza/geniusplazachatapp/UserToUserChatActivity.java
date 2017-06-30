@@ -1,33 +1,62 @@
 package com.example.geniusplaza.geniusplazachatapp;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.geniusplaza.geniusplazachatapp.POJO.Chat;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
+import com.example.geniusplaza.geniusplazachatapp.POJO.User;
+import com.example.geniusplaza.geniusplazachatapp.Utils.Constants;
+import com.example.geniusplaza.geniusplazachatapp.fcm.MyFirebaseMessagingService;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserToUserChatActivity extends AppCompatActivity {
     LinearLayout layout;
-    Button sendButton;
-    EditText messageArea;
+    FloatingActionButton sendButton;
+    EditText input;
     ScrollView scrollView;
-    Firebase reference1, reference2;
+    private DatabaseReference reference1, reference2;
+    private FirebaseUser currentUser;
+    FirebaseDatabase firebaseDatabase;
+    private FirebaseListAdapter<Chat> adapter;
+    public TextView messageText, messageUser, messageTime;
+
+    ListView listOfMessages;
+
+    private String sender;
+    private String receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,95 +64,106 @@ public class UserToUserChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_to_user_chat);
         Bundle bundle = getIntent().getExtras();
         final String userName = bundle.getString("userName");
+        receiver = getIntent().getStringExtra("userName");
         setTitle(userName);
-        layout = (LinearLayout)findViewById(R.id.layout1);
-        sendButton = (Button)findViewById(R.id.button_send);
-        messageArea = (EditText)findViewById(R.id.messageArea);
+
+        listOfMessages = (ListView) findViewById(R.id.list_of_messages);
+        sendButton = (FloatingActionButton)findViewById(R.id.fab);
+        input = (EditText)findViewById(R.id.input);
         scrollView = (ScrollView)findViewById(R.id.scrollView);
 
-        Firebase.setAndroidContext(this);
-        reference1 = new Firebase("https://geniusplazachatapp.firebaseio.com/message/" + FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + "_" + userName);
-        reference2 = new Firebase("https://geniusplazachatapp.firebaseio.com/message/" + userName + "_" + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        FirebaseApp.initializeApp(this);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        reference1 = firebaseDatabase.getReference();
+        reference2 = firebaseDatabase.getReference();
+
+        //getting current logged user
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        sender = currentUser.getDisplayName();
+
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String messageText = messageArea.getText().toString();
+                String messageText = input.getText().toString();
 
                 if(!messageText.equals("")){
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("message", messageText);
-                    map.put("user", FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                    reference1.push().setValue(map);
-                    reference2.push().setValue(map);
+                    Log.d("Sender and receiver: " + sender, receiver);
+
+                    reference1.child("messages").child(sender+"_"+receiver).push().setValue(new Chat(sender, receiver,messageText));
+                    reference2.child("messages").child(receiver+"_"+sender).push().setValue(new Chat(sender,receiver, messageText));
+
+                    input.setText("");
+
                 }
             }
         });
 
-        reference1.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Map map = dataSnapshot.getValue(Map.class);
-                String message = map.get("message").toString();
-                String userNameString = map.get("user").toString();
+        displayChatMessages();
 
-                if(userNameString.equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())){ //YOUR MESSAGE
-                    addMessageBoxSelf("You:-\n" + message);
+    }
+    private void displayChatMessages() {
+
+
+        adapter = new FirebaseListAdapter<Chat>(this, Chat.class,
+                R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_"+receiver)) {
+            @Override
+            protected void populateView(View v, Chat model, int position) {
+                // Get references to the views of message.xml
+                messageText = (TextView) v.findViewById(R.id.message_text);
+                messageUser = (TextView) v.findViewById(R.id.message_user);
+                messageTime = (TextView) v.findViewById(R.id.message_time);
+
+                // Set their text
+                messageText.setText(model.getMessage());
+
+                Log.d("hello", model.getSender());
+                Log.d("hello from sender", sender);
+                if(model.getSender().equals(sender)){
+                    messageUser.setText("You");
+                } else {
+                    messageUser.setText(model.getSender());
                 }
-                else{ //THEIR MESSAGE
-                    addMessageBoxThem(userName + ":-\n" + message);
-                }
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                // Format the date before showing it
+                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                        model.getTimestamp()));
 
             }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+        };
 
-            }
+        listOfMessages.setAdapter(adapter);
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
     }
 
-    public void addMessageBoxSelf(String message){
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        adapter.cleanup();
+    }
+
+    public void addMessageBox(String message, int type){
+
         TextView textView = new TextView(UserToUserChatActivity.this);
         textView.setText(message);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, 10);
-        textView.setLayoutParams(lp);
-        textView.setTextColor(Color.BLACK);
-        textView.setGravity(Gravity.RIGHT);
 
-        textView.setBackgroundResource(R.drawable.rounded_color_blue);
+        LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp2.weight = 1.0f;
 
+        if(type == 1){
+            lp2.gravity = Gravity.LEFT;
+            textView.setBackgroundResource(R.drawable.rounded_color_grey);
+        } else {
+            lp2.gravity = Gravity.RIGHT;
+            textView.setBackgroundResource(R.drawable.rounded_color_blue);
+        }
+        textView.setLayoutParams(lp2);
         layout.addView(textView);
-        messageArea.setText("");
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
-    public void addMessageBoxThem(String message){
-        TextView textView = new TextView(UserToUserChatActivity.this);
-        textView.setText(message);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, 10);
-        textView.setLayoutParams(lp);
-        textView.setTextColor(Color.BLACK);
 
-        textView.setBackgroundResource(R.drawable.rounded_color_grey);
-
-        layout.addView(textView);
-        messageArea.setText("");
-        scrollView.fullScroll(View.FOCUS_DOWN);
-    }
 }

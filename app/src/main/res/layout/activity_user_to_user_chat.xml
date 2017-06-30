@@ -1,32 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="#ffffff"
-    android:orientation="vertical"
-    tools:context=".UserToUserChatActivity">
+    tools:context="com.example.geniusplaza.geniusplazachatapp.UserToUserChatActivity">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_weight="20"
-        android:padding="15dp"
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/scrollView">
+        android:clickable="true"
+        app:srcCompat="@android:drawable/ic_dialog_email"
+        android:id="@+id/fab"
+        android:tint="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        app:fabSize="mini"
+        android:layout_alignParentRight="true" />
 
-        <LinearLayout
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/fab"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true">
+
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/layout1">
+            android:hint="Input"
+            android:id="@+id/input"
+            />
+    </android.support.design.widget.TextInputLayout>
 
-        </LinearLayout>
-    </ScrollView>
-
-    <include
-        layout="@layout/message_area"
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:layout_marginTop="5dp"/>
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_above="@id/fab"
+        android:dividerHeight="16dp"
+        android:divider="@android:color/transparent"
+        android:id="@+id/list_of_messages"
+        android:layout_marginBottom="16dp"
+        android:layout_alignParentLeft="true"
+        />
+</RelativeLayout>
