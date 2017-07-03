@@ -2,6 +2,7 @@ package com.example.geniusplaza.geniusplazachatapp;
 
 import android.content.Intent;
 import android.provider.SyncStateContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,6 +12,7 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,20 +36,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class UserListActivity extends AppCompatActivity {
+public class AddFriendActivity extends AppCompatActivity {
     public FirebaseListAdapter<User> adapter,adapterSearch;
     public static final String ARG_USERS = "users";
     public List<User> users;
     EditText textSearchTerm;
+    public FloatingActionButton addFriendButton;
+    public DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_list);
+        setContentView(R.layout.activity_add_friend);
         displayUsers();
         textSearchTerm = (EditText)findViewById(R.id.inputSearchterm);
         final String searchvalue = textSearchTerm.getText().toString();
-        textSearchTerm.addTextChangedListener(new TextWatcher() {
+        /*textSearchTerm.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -57,24 +61,34 @@ public class UserListActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 ListView listOfUsersSearch = (ListView)findViewById(R.id.list_of_users);
 
-                adapterSearch = new FirebaseListAdapter<User>(UserListActivity.this, User.class,
-                        R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("friends")) {
+                adapterSearch = new FirebaseListAdapter<User>(AddFriendActivity.this, User.class,
+                        R.layout.add_friend_row, FirebaseDatabase.getInstance().getReference().child("users")) {
                     @Override
                     protected void populateView(View v, final User model, int position) {
                         // Get references to the views of message.xml
                         TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                         TextView userName = (TextView)v.findViewById(R.id.name_user);
+                        addFriendButton = (Button) findViewById(R.id.addFriendButton);
 //                FirebaseMessaging.getInstance().send(RemoteMessage );
                         Log.d("search",model.email);
                         Log.d("search term", searchvalue);
                         if((!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && model.email.contains(textSearchTerm.getText().toString().toLowerCase()) ){
                             userEmail.setText(model.email);
                             userName.setText(model.name);
+                            addFriendButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.d("User name: ", model.name);
+                                    mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                                    User user = new User(model.uid, model.email, model.name, model.fireBaseToken);
+                                    mDatabaseReference.child("friends").child(model.uid).setValue(user);
+                                }
+                            });
                         }
                         v.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent i = new Intent(UserListActivity.this,UserToUserChatActivity.class);
+                                Intent i = new Intent(AddFriendActivity.this,UserToUserChatActivity.class);
                                 i.putExtra("userName",model.name);
                                 i.putExtra("email",model.email);
                                 i.putExtra("uid",model.uid);
@@ -82,8 +96,7 @@ public class UserListActivity extends AppCompatActivity {
                                 startActivity(i);
                             }
                         });
-//                // Set their text
-//                userEmail.setText(model.getEmail());
+
                     }
                 };
                 listOfUsersSearch.setAdapter(adapterSearch);
@@ -93,46 +106,40 @@ public class UserListActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
 
             }
-        });
+        });*/
     }
 
     private void displayUsers() {
         ListView listOfUsers = (ListView)findViewById(R.id.list_of_users);
 
         adapter = new FirebaseListAdapter<User>(this, User.class,
-                R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("friends")) {
+                R.layout.add_friend_row, FirebaseDatabase.getInstance().getReference().child("users")) {
             @Override
             protected void populateView(View v, final User model, int position) {
                 // Get references to the views of message.xml
                 TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                 TextView userName = (TextView)v.findViewById(R.id.name_user);
+                addFriendButton = (FloatingActionButton) v.findViewById(R.id.addFriendButton);
 //                FirebaseMessaging.getInstance().send(RemoteMessage );
                 if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) ){
                     userEmail.setText(model.email);
                     userName.setText(model.name);
+                    addFriendButton.setVisibility(View.VISIBLE);
+
+                    addFriendButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("User name: ", model.name);
+                            mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                            User user = new User(model.uid, model.email, model.name, model.fireBaseToken);
+                            mDatabaseReference.child("friends").child(model.uid).setValue(user);
+                        }
+                    });
                 }
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(UserListActivity.this,UserToUserChatActivity.class);
-                        i.putExtra("userName",model.name);
-                        i.putExtra("email",model.email);
-                        i.putExtra("uid",model.uid);
-                        i.putExtra("token",model.fireBaseToken);
-                        startActivity(i);
-                    }
-                });
-//                // Set their text
-//                userEmail.setText(model.getEmail());
             }
         };
         Log.d("token id:", FirebaseInstanceId.getInstance().getToken());
         listOfUsers.setAdapter(adapter);
 
-    }
-
-    public void addNewFriendButton(View v){
-        Intent i = new Intent(this, AddFriendActivity.class);
-        startActivity(i);
     }
 }

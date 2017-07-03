@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.geniusplaza.geniusplazachatapp.UserListActivity">
+    tools:context="com.example.geniusplaza.geniusplazachatapp.AddFriendActivity">
 
     <EditText
         android:layout_width="378dp"
         android:layout_height="wrap_content"
         android:id="@+id/inputSearchterm"
         tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginEnd="10dp"
         tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -20,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/inputSearchterm"
 
-        android:layout_above="@id/fab"
         android:dividerHeight="16dp"
         android:divider="@android:color/transparent"
         android:id="@+id/list_of_users"
@@ -33,19 +34,4 @@
         app:layout_constraintTop_toBottomOf="@+id/inputSearchterm"
         tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent" />
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/addNewFriendButton"
-        android:onClick="addNewFriendButton"
-        android:src="@drawable/ic_add"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="16dp" />
-
-
-
 </android.support.constraint.ConstraintLayout>
