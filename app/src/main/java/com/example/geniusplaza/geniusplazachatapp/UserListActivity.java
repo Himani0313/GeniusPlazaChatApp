@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import retrofit2.http.Query;
+
 public class UserListActivity extends AppCompatActivity {
     public FirebaseListAdapter<User> adapter,adapterSearch;
     public static final String ARG_USERS = "users";
@@ -44,10 +46,12 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
+        setTitle("Friend List");
         displayUsers();
         textSearchTerm = (EditText)findViewById(R.id.inputSearchterm);
         final String searchvalue = textSearchTerm.getText().toString();
-        textSearchTerm.addTextChangedListener(new TextWatcher() {
+        textSearchTerm.addTextChangedListener(new TextWatcher()
+        {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -58,7 +62,7 @@ public class UserListActivity extends AppCompatActivity {
                 ListView listOfUsersSearch = (ListView)findViewById(R.id.list_of_users);
 
                 adapterSearch = new FirebaseListAdapter<User>(UserListActivity.this, User.class,
-                        R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("friends")) {
+                        R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
                     @Override
                     protected void populateView(View v, final User model, int position) {
                         // Get references to the views of message.xml
@@ -100,13 +104,15 @@ public class UserListActivity extends AppCompatActivity {
         ListView listOfUsers = (ListView)findViewById(R.id.list_of_users);
 
         adapter = new FirebaseListAdapter<User>(this, User.class,
-                R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("friends")) {
+                R.layout.user_row, FirebaseDatabase.getInstance().getReference().child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
             @Override
             protected void populateView(View v, final User model, int position) {
                 // Get references to the views of message.xml
                 TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                 TextView userName = (TextView)v.findViewById(R.id.name_user);
 //                FirebaseMessaging.getInstance().send(RemoteMessage );
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
                 if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) ){
                     userEmail.setText(model.email);
                     userName.setText(model.name);

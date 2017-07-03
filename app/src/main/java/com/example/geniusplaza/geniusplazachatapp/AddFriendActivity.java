@@ -3,6 +3,7 @@ package com.example.geniusplaza.geniusplazachatapp;
 import android.content.Intent;
 import android.provider.SyncStateContract;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -20,12 +21,14 @@ import android.widget.Toast;
 
 import com.example.geniusplaza.geniusplazachatapp.POJO.ChatMessage;
 import com.example.geniusplaza.geniusplazachatapp.POJO.User;
+import com.example.geniusplaza.geniusplazachatapp.POJO.UserFriend;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -41,13 +44,15 @@ public class AddFriendActivity extends AppCompatActivity {
     public static final String ARG_USERS = "users";
     public List<User> users;
     EditText textSearchTerm;
-    public FloatingActionButton addFriendButton;
+    public FloatingActionButton addFriendButton, deleteFriendButton;
     public DatabaseReference mDatabaseReference;
+    public static boolean userThereInFriendlist = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
+        setTitle("Add Friend");
         displayUsers();
         textSearchTerm = (EditText)findViewById(R.id.inputSearchterm);
         final String searchvalue = textSearchTerm.getText().toString();
@@ -120,19 +125,65 @@ public class AddFriendActivity extends AppCompatActivity {
                 TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                 TextView userName = (TextView)v.findViewById(R.id.name_user);
                 addFriendButton = (FloatingActionButton) v.findViewById(R.id.addFriendButton);
+                deleteFriendButton = (FloatingActionButton) v.findViewById(R.id.deleteFriendButton);
 //                FirebaseMessaging.getInstance().send(RemoteMessage );
                 if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) ){
                     userEmail.setText(model.email);
                     userName.setText(model.name);
+
                     addFriendButton.setVisibility(View.VISIBLE);
 
                     addFriendButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Log.d("User name: ", model.name);
                             mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-                            User user = new User(model.uid, model.email, model.name, model.fireBaseToken);
-                            mDatabaseReference.child("friends").child(model.uid).setValue(user);
+                            mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Log.d("the value of snapshot", dataSnapshot.child(model.uid).toString());
+                                    if(dataSnapshot.child(model.uid).exists()){
+                                        addFriendButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_delete));
+                                        Toast.makeText(getApplicationContext(), "Already your friend", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Log.d("User name: ", model.name);
+                                        addFriendButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_add));
+                                        User user = new User(model.uid, model.email, model.name, model.fireBaseToken);
+                                        mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child(model.uid).setValue(user);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+                        }
+                    });
+                    deleteFriendButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                            mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Log.d("the value of snapshot", dataSnapshot.child(model.uid).toString());
+                                    if(dataSnapshot.child(model.uid).exists()){
+                                        Log.d("Delete test: ", model.name);
+                                        dataSnapshot.child(model.uid).getRef().setValue(null);
+                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(), "Is not your friend", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                         }
                     });
                 }
@@ -140,6 +191,5 @@ public class AddFriendActivity extends AppCompatActivity {
         };
         Log.d("token id:", FirebaseInstanceId.getInstance().getToken());
         listOfUsers.setAdapter(adapter);
-
     }
 }

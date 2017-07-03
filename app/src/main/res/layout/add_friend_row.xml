@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:layout_width="wrap_content"
@@ -18,9 +20,18 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
         android:id="@+id/addFriendButton"
+        app:fabSize="mini"
         android:onClick="addFriendButton"
         android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@+id/email_user"
-        android:visibility="gone"/>
+        android:layout_toRightOf="@+id/email_user" />
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete"
+        android:id="@+id/deleteFriendButton"
+        app:fabSize="mini"
+        android:onClick="deleteFriendButton"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/addFriendButton" />
 
 </RelativeLayout>
