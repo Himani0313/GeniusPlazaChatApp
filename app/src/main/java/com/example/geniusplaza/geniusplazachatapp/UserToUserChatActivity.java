@@ -38,6 +38,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     private FirebaseListAdapter<Chat> adapter;
     public TextView messageText, messageUser, messageTime;
+    public String messageTextInput;
 
     ListView listOfMessages;
 
@@ -88,17 +90,39 @@ public class UserToUserChatActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String messageText = input.getText().toString();
+                messageTextInput = input.getText().toString();
 
-                if(!messageText.equals("")){
+                if(!messageTextInput.equals("")){
                     Log.d("Sender and receiver: " + sender, receiver);
 
-                    reference1.child("messages").child(sender+"_"+receiver).push().setValue(new Chat(sender, receiver,messageText));
-                    reference2.child("messages").child(receiver+"_"+sender).push().setValue(new Chat(sender,receiver, messageText));
+                    reference1.child("messages").child(sender+"_"+receiver).push().setValue(new Chat(sender, receiver,messageTextInput));
+                    reference2.child("messages").child(receiver+"_"+sender).push().setValue(new Chat(sender,receiver, messageTextInput));
 
                     input.setText("");
 
+//                    MyFirebaseMessagingService myFirebaseMessagingService = new MyFirebaseMessagingService();
+//                    myFirebaseMessagingService.onMessageReceived(new RemoteMessage(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                    Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0 , intent,PendingIntent.FLAG_ONE_SHOT);
+                    Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                    Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(getApplicationContext())
+                                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                                    .setContentTitle(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                                    .setContentText(messageTextInput)
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setPriority(Notification.PRIORITY_HIGH);
+
+
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    notificationManager.notify(0/* ID of notification */, mBuilder.build());
+
                 }
+
             }
         });
 
@@ -126,6 +150,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
                     messageUser.setText("You");
                 } else {
                     messageUser.setText(model.getSender());
+
                 }
 
                 // Format the date before showing it
