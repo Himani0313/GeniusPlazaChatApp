@@ -10,22 +10,27 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.geniusplaza.geniusplazachatapp.POJO.Chat;
 import com.example.geniusplaza.geniusplazachatapp.POJO.User;
 import com.example.geniusplaza.geniusplazachatapp.Utils.Constants;
@@ -40,6 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +60,8 @@ public class UserToUserChatActivity extends AppCompatActivity {
     private FirebaseListAdapter<Chat> adapter;
     public TextView messageText, messageUser, messageTime;
     public String messageTextInput;
+    final int REQUEST_IMAGE_CAPTURE = 100;
+    ImageView messageImage;
 
     ListView listOfMessages;
 
@@ -70,9 +78,10 @@ public class UserToUserChatActivity extends AppCompatActivity {
         setTitle(userName);
 
         listOfMessages = (ListView) findViewById(R.id.list_of_messages);
-        sendButton = (FloatingActionButton)findViewById(R.id.fab);
-        input = (EditText)findViewById(R.id.input);
-        scrollView = (ScrollView)findViewById(R.id.scrollView);
+        sendButton = (FloatingActionButton) findViewById(R.id.fab);
+        input = (EditText) findViewById(R.id.input);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        messageImage = (ImageView) findViewById(R.id.messageImage);
 
         FirebaseApp.initializeApp(this);
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -92,11 +101,11 @@ public class UserToUserChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 messageTextInput = input.getText().toString();
 
-                if(!messageTextInput.equals("")){
+                if (!messageTextInput.equals("")) {
                     Log.d("Sender and receiver: " + sender, receiver);
 
-                    reference1.child("messages").child(sender+"_"+receiver).push().setValue(new Chat(sender, receiver,messageTextInput));
-                    reference2.child("messages").child(receiver+"_"+sender).push().setValue(new Chat(sender,receiver, messageTextInput));
+                    reference1.child("messages").child(sender + "_" + receiver).push().setValue(new Chat(sender, receiver, messageTextInput));
+                    reference2.child("messages").child(receiver + "_" + sender).push().setValue(new Chat(sender, receiver, messageTextInput));
 
                     input.setText("");
 
@@ -104,9 +113,9 @@ public class UserToUserChatActivity extends AppCompatActivity {
 //                    myFirebaseMessagingService.onMessageReceived(new RemoteMessage(FirebaseAuth.getInstance().getCurrentUser().getUid()));
                     Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0 , intent,PendingIntent.FLAG_ONE_SHOT);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_ONE_SHOT);
                     Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                    Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(getApplicationContext())
                                     .setSmallIcon(R.mipmap.ic_launcher_round)
@@ -129,33 +138,65 @@ public class UserToUserChatActivity extends AppCompatActivity {
         displayChatMessages();
 
     }
+
     private void displayChatMessages() {
 
 
         adapter = new FirebaseListAdapter<Chat>(this, Chat.class,
-                R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages").child(sender+"_"+receiver)) {
+                R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages").child(sender + "_" + receiver)) {
             @Override
             protected void populateView(View v, Chat model, int position) {
                 // Get references to the views of message.xml
                 messageText = (TextView) v.findViewById(R.id.message_text);
                 messageUser = (TextView) v.findViewById(R.id.message_user);
                 messageTime = (TextView) v.findViewById(R.id.message_time);
-
+                messageImage = (ImageView) v.findViewById(R.id.messageImage);
                 // Set their text
-                messageText.setText(model.getMessage());
+                if(model.getImageURL() != null){
+                    messageText.setVisibility(View.GONE);
+                    messageUser.setVisibility(View.VISIBLE);
+                    messageTime.setVisibility(View.VISIBLE);
+                    messageImage.setVisibility(View.VISIBLE);
+                    if (model.getSender().equals(sender)) {
+                        messageUser.setText("You");
+                    } else {
+                        messageUser.setText(model.getSender());
 
-                Log.d("hello", model.getSender());
-                Log.d("hello from sender", sender);
-                if(model.getSender().equals(sender)){
-                    messageUser.setText("You");
-                } else {
-                    messageUser.setText(model.getSender());
+                    }
 
+                    // Format the date before showing it
+                    messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                            model.getTimestamp()));
+                    byte[] decodedString = Base64.decode(model.getImageURL(), Base64.DEFAULT);
+
+                    Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    DisplayMetrics dm = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                    messageImage.setImageBitmap(bm);
+                    messageText.setVisibility(View.VISIBLE);
+                }
+                else {
+                    messageImage.setVisibility(View.GONE);
+                    messageText.setVisibility(View.VISIBLE);
+                    messageUser.setVisibility(View.VISIBLE);
+                    messageTime.setVisibility(View.VISIBLE);
+                    messageText.setText(model.getMessage());
+
+                    Log.d("hello", model.getSender());
+                    Log.d("hello from sender", sender);
+                    if (model.getSender().equals(sender)) {
+                        messageUser.setText("You");
+                    } else {
+                        messageUser.setText(model.getSender());
+
+                    }
+
+                    // Format the date before showing it
+                    messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                            model.getTimestamp()));
                 }
 
-                // Format the date before showing it
-                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
-                        model.getTimestamp()));
 
             }
 
@@ -171,7 +212,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
         adapter.cleanup();
     }
 
-    public void addMessageBox(String message, int type){
+    public void addMessageBox(String message, int type) {
 
         TextView textView = new TextView(UserToUserChatActivity.this);
         textView.setText(message);
@@ -179,7 +220,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
         LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp2.weight = 1.0f;
 
-        if(type == 1){
+        if (type == 1) {
             lp2.gravity = Gravity.LEFT;
             textView.setBackgroundResource(R.drawable.rounded_color_grey);
         } else {
@@ -191,4 +232,31 @@ public class UserToUserChatActivity extends AppCompatActivity {
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
 
+    public void addPictureFab(View v) {
+        onLaunchCamera();
+    }
+    public void onLaunchCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == this.RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            messageImage.setVisibility(View.VISIBLE);
+            messageImage.setImageBitmap(imageBitmap);
+            encodeBitmapAndSaveToFirebase(imageBitmap);
+        }
+    }
+    public void encodeBitmapAndSaveToFirebase(Bitmap bitmap) {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        reference1.child("messages").child(sender + "_" + receiver).push().setValue(new Chat(sender,receiver,imageEncoded,1));
+        reference2.child("messages").child(receiver + "_" + sender).push().setValue(new Chat(sender,receiver,imageEncoded,1));
+    }
 }

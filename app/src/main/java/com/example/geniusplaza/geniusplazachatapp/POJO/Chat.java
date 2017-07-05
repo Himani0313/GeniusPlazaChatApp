@@ -11,17 +11,23 @@ public class Chat  {
     public String receiver;
     public String message;
     public long timestamp;
-
+    public String imageURL;
     public Chat(){
 
     }
-
+    public Chat(String sender, String receiver,String imageURL, int trial){
+        this.imageURL = imageURL;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.message = null;
+        timestamp = new Date().getTime();
+    }
     public Chat(String sender, String receiver, String message){
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
         timestamp = new Date().getTime();
-
+        this.imageURL = null;
     }
 
     public String getSender() {
@@ -54,5 +60,13 @@ public class Chat  {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 }
