@@ -148,7 +148,7 @@ public class AddFriendActivity extends AppCompatActivity {
                                     else{
                                         Log.d("User name: ", model.name);
                                         addFriendButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_add));
-                                        User user = new User(model.uid, model.email, model.name, model.fireBaseToken);
+                                        User user = new User(model.uid, model.email, model.name, model.fireBaseToken, model.aboutMe);
                                         mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child(model.uid).setValue(user);
                                     }
                                 }

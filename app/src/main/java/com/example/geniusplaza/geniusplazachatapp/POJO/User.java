@@ -11,13 +11,15 @@ public class User {
     public String email;
     public String name;
     public String fireBaseToken;
+    public String aboutMe;
     public User() {
     }
 
-    public User(String uid, String email, String name, String fireBaseToken) {
+    public User(String uid, String email, String name, String fireBaseToken, String aboutMe) {
         this.uid = uid;
         this.email = email;
         this.name = name;
         this.fireBaseToken = fireBaseToken;
+        this.aboutMe = aboutMe;
     }
 }

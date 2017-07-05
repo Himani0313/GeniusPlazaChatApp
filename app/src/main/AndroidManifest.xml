@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.geniusplaza.geniusplazachatapp"
-    >
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.camera" android:required="false">
+    package="com.example.geniusplaza.geniusplazachatapp">
 
-    </uses-feature>
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"></uses-feature>
 
     <application
         android:allowBackup="true"
@@ -36,7 +37,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".AddFriendActivity"></activity>
+        <activity android:name=".AddFriendActivity" />
+        <activity android:name=".UserProfileActivity"></activity>
     </application>
 
 </manifest>

@@ -4,4 +4,6 @@
 
     <item android:title="Sign out" app:showAsAction="never"
         android:id="@+id/menu_sign_out"/>
+    <item android:title="User Profile" app:showAsAction="never"
+        android:id="@+id/user_profile"/>
 </menu>

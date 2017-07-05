@@ -60,7 +60,7 @@ public class DashboardActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG)
                         .show();
                 mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-                User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),FirebaseAuth.getInstance().getCurrentUser().getEmail(),FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseInstanceId.getInstance().getToken());
+                User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid(),FirebaseAuth.getInstance().getCurrentUser().getEmail(),FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseInstanceId.getInstance().getToken(), null);
                 mDatabaseReference.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
                 //displayChatMessages();
             } else {
@@ -96,6 +96,10 @@ public class DashboardActivity extends AppCompatActivity {
                             finish();
                         }
                     });
+        }
+        else if (item.getItemId() == R.id.user_profile){
+            Intent i = new Intent(this, UserProfileActivity.class);
+            startActivity(i);
         }
         return true;
     }

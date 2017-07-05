@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -27,6 +28,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -62,6 +64,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
     public String messageTextInput;
     final int REQUEST_IMAGE_CAPTURE = 100;
     ImageView messageImage;
+    RelativeLayout relativeLayout;
 
     ListView listOfMessages;
 
@@ -141,7 +144,6 @@ public class UserToUserChatActivity extends AppCompatActivity {
 
     private void displayChatMessages() {
 
-
         adapter = new FirebaseListAdapter<Chat>(this, Chat.class,
                 R.layout.message_area, FirebaseDatabase.getInstance().getReference().child("messages").child(sender + "_" + receiver)) {
             @Override
@@ -151,6 +153,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
                 messageUser = (TextView) v.findViewById(R.id.message_user);
                 messageTime = (TextView) v.findViewById(R.id.message_time);
                 messageImage = (ImageView) v.findViewById(R.id.messageImage);
+                relativeLayout = (RelativeLayout) v.findViewById(R.id.relativeLayout);
                 // Set their text
                 if(model.getImageURL() != null){
                     messageText.setVisibility(View.GONE);
@@ -159,9 +162,18 @@ public class UserToUserChatActivity extends AppCompatActivity {
                     messageImage.setVisibility(View.VISIBLE);
                     if (model.getSender().equals(sender)) {
                         messageUser.setText("You");
+                        messageText.setGravity(Gravity.START);
+                        messageUser.setGravity(Gravity.START);
+                        messageTime.setGravity(Gravity.START);
+                        messageImage.setScaleType(ImageView.ScaleType.FIT_START);
+                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_blue);
                     } else {
                         messageUser.setText(model.getSender());
-
+                        messageText.setGravity(Gravity.END);
+                        messageUser.setGravity(Gravity.END);
+                        messageTime.setGravity(Gravity.END);
+                        messageImage.setScaleType(ImageView.ScaleType.FIT_END);
+                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_grey);
                     }
 
                     // Format the date before showing it
@@ -187,9 +199,16 @@ public class UserToUserChatActivity extends AppCompatActivity {
                     Log.d("hello from sender", sender);
                     if (model.getSender().equals(sender)) {
                         messageUser.setText("You");
+                        messageText.setGravity(Gravity.START);
+                        messageUser.setGravity(Gravity.START);
+                        messageTime.setGravity(Gravity.START);
+                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_blue);
                     } else {
                         messageUser.setText(model.getSender());
-
+                        messageText.setGravity(Gravity.END);
+                        messageUser.setGravity(Gravity.END);
+                        messageTime.setGravity(Gravity.END);
+                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_grey);
                     }
 
                     // Format the date before showing it

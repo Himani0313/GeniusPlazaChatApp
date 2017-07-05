@@ -6,12 +6,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:id="@+id/name_user" />
+        android:id="@+id/name_user"
+        android:textSize="16sp"
+        android:textStyle="bold|italic"
+        android:fontFamily="casual"
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/name_user"
         android:layout_marginLeft="40dp"
-        android:id="@+id/email_user" />
+        android:id="@+id/email_user"
+        android:textSize="16sp"
+        android:textStyle="bold|italic"
+        android:fontFamily="casual"/>
 
 </RelativeLayout>
