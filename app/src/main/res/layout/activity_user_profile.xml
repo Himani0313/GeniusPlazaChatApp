@@ -8,27 +8,44 @@
     tools:context="com.example.geniusplaza.geniusplazachatapp.UserProfileActivity">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/user_profile_pic"/>
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/user_profile_pic"
+        android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:onClick="changeProfilePic"/>
     <TextView
         android:id="@+id/user_profile_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/user_profile_email"/>
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="10dp"
+        android:textSize="27sp"
+        android:textStyle="bold"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_profile_email"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/user_about_me"
-        android:hint="Enter Information"/>
+        android:hint="Enter Information"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="10dp"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/submitProfileChanges"
         android:text="Submit Changes"
-        android:onClick="submitProfileChanges"/>
+        android:onClick="submitProfileChanges"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"/>
 
 </LinearLayout>
