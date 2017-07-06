@@ -45,6 +45,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.ByteArrayOutputStream;
@@ -61,9 +63,9 @@ public class UserToUserChatActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     private FirebaseListAdapter<Chat> adapter;
     public TextView messageText, messageUser, messageTime;
-    public String messageTextInput;
+    public String messageTextInput, currentUserImageUrl, receiverUserImageUrl;
     final int REQUEST_IMAGE_CAPTURE = 100;
-    ImageView messageImage;
+    ImageView messageImage, userProfilePic;
     RelativeLayout relativeLayout;
 
     ListView listOfMessages;
@@ -78,6 +80,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         final String userName = bundle.getString("userName");
         receiver = getIntent().getStringExtra("userName");
+        receiverUserImageUrl = getIntent().getStringExtra("profileImg");
         setTitle(userName);
 
         listOfMessages = (ListView) findViewById(R.id.list_of_messages);
@@ -85,6 +88,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
         input = (EditText) findViewById(R.id.input);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         messageImage = (ImageView) findViewById(R.id.messageImage);
+        //userProfilePic = (ImageView) findViewById(R.id.messageProfilePic);
 
         FirebaseApp.initializeApp(this);
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -94,6 +98,23 @@ public class UserToUserChatActivity extends AppCompatActivity {
         //getting current logged user
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         sender = currentUser.getDisplayName();
+
+
+        DatabaseReference users = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        Query query = users.orderByChild("email");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                currentUserImageUrl = user.profileImg;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -153,6 +174,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
                 messageUser = (TextView) v.findViewById(R.id.message_user);
                 messageTime = (TextView) v.findViewById(R.id.message_time);
                 messageImage = (ImageView) v.findViewById(R.id.messageImage);
+                userProfilePic = (ImageView) v.findViewById(R.id.messageProfilePic);
                 relativeLayout = (RelativeLayout) v.findViewById(R.id.relativeLayout);
                 // Set their text
                 if(model.getImageURL() != null){
@@ -167,6 +189,13 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageTime.setGravity(Gravity.START);
                         messageImage.setScaleType(ImageView.ScaleType.FIT_START);
                         relativeLayout.setBackgroundResource(R.drawable.rounded_color_blue);
+
+                        byte[] decodedString = Base64.decode(currentUserImageUrl, Base64.DEFAULT);
+                        Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        DisplayMetrics dm = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                        userProfilePic.setImageBitmap(bm);
                     } else {
                         messageUser.setText(model.getSender());
                         messageText.setGravity(Gravity.END);
@@ -174,13 +203,20 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageTime.setGravity(Gravity.END);
                         messageImage.setScaleType(ImageView.ScaleType.FIT_END);
                         relativeLayout.setBackgroundResource(R.drawable.rounded_color_grey);
+
+                        byte[] decodedString = Base64.decode(receiverUserImageUrl, Base64.DEFAULT);
+                        Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        DisplayMetrics dm = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                        userProfilePic.setImageBitmap(bm);
                     }
 
                     // Format the date before showing it
                     messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
                             model.getTimestamp()));
-                    byte[] decodedString = Base64.decode(model.getImageURL(), Base64.DEFAULT);
 
+                    byte[] decodedString = Base64.decode(model.getImageURL(), Base64.DEFAULT);
                     Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                     DisplayMetrics dm = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -203,12 +239,27 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageUser.setGravity(Gravity.START);
                         messageTime.setGravity(Gravity.START);
                         relativeLayout.setBackgroundResource(R.drawable.rounded_color_blue);
+
+                        byte[] decodedString = Base64.decode(currentUserImageUrl, Base64.DEFAULT);
+                        Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        DisplayMetrics dm = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(dm);
+                        Log.d("Url String: ", currentUserImageUrl);
+
+                        userProfilePic.setImageBitmap(bm);
                     } else {
                         messageUser.setText(model.getSender());
                         messageText.setGravity(Gravity.END);
                         messageUser.setGravity(Gravity.END);
                         messageTime.setGravity(Gravity.END);
                         relativeLayout.setBackgroundResource(R.drawable.rounded_color_grey);
+
+                        byte[] decodedString = Base64.decode(receiverUserImageUrl, Base64.DEFAULT);
+                        Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        DisplayMetrics dm = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                        userProfilePic.setImageBitmap(bm);
                     }
 
                     // Format the date before showing it

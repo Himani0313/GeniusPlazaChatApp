@@ -1,3 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="match_parent"
+    android:id="@+id/linearLayout"
+    android:padding="15dp"
+    android:layout_margin="15dp"
+    android:orientation= "horizontal">
+
+    <ImageView
+        android:layout_width="10dp"
+        android:layout_height="15dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:id="@+id/messageProfilePic"
+        android:src="@drawable/com_facebook_profile_picture_blank_portrait"/>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content" android:layout_height="match_parent"
     android:id="@+id/relativeLayout"
@@ -41,3 +56,4 @@
         android:id="@+id/messageImage"
         android:visibility="gone"/>
 </RelativeLayout>
+</LinearLayout>

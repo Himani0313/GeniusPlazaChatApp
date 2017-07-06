@@ -83,6 +83,7 @@ public class UserListActivity extends AppCompatActivity {
                                 i.putExtra("email",model.email);
                                 i.putExtra("uid",model.uid);
                                 i.putExtra("token",model.fireBaseToken);
+                                i.putExtra("profileImg", model.profileImg);
                                 startActivity(i);
                             }
                         });
@@ -125,6 +126,7 @@ public class UserListActivity extends AppCompatActivity {
                         i.putExtra("email",model.email);
                         i.putExtra("uid",model.uid);
                         i.putExtra("token",model.fireBaseToken);
+                        i.putExtra("profileImg", model.profileImg);
                         startActivity(i);
                     }
                 });
