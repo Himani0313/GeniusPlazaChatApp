@@ -1,59 +1,77 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="match_parent"
-    android:id="@+id/linearLayout"
-    android:padding="15dp"
-    android:layout_margin="15dp"
-    android:orientation= "horizontal">
-
-    <ImageView
-        android:layout_width="10dp"
-        android:layout_height="15dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:id="@+id/messageProfilePic"
-        android:src="@drawable/com_facebook_profile_picture_blank_portrait"/>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="match_parent"
-    android:id="@+id/relativeLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
     android:padding="15dp"
-    android:layout_margin="15dp">
+    >
 
-    <TextView
-        android:id="@+id/message_user"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:textColor="@color/authui_inputTextColorDark"
-        android:textStyle="normal|bold"
-        android:layout_margin="10dp"/>
+    <com.pkmmte.view.CircularImageView
+        android:id="@+id/messageProfilePic"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+        app:border="true"
+        app:border_color="#EEEEEE"
+        app:border_width="1dp"
+        app:shadow="true"
+        android:visibility="gone"
+        />
 
-    <TextView
-        android:id="@+id/message_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/message_user"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
 
-    <TextView
-        android:id="@+id/message_text"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="266dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/message_time"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/authui_colorAccent"
-        android:textSize="18sp"
-        android:layout_margin="10dp"/>
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/message_time"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:id="@+id/messageImage"
-        android:visibility="gone"/>
+        android:orientation="vertical"
+        android:layout_gravity="center|center_horizontal"
+        android:layout_toRightOf="@+id/messageProfilePic"
+        >
+
+        <TextView
+            android:id="@+id/message_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/authui_inputTextColorDark"
+            android:textStyle="normal|bold" />
+
+        <TextView
+            android:id="@+id/message_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/message_user" />
+
+        <TextView
+            android:id="@+id/message_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/message_time"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/authui_colorAccent"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/messageImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/message_time"
+            android:layout_marginTop="5dp"
+            android:visibility="gone" />
+    </LinearLayout>
+    <com.pkmmte.view.CircularImageView
+        android:id="@+id/messageReceiverProfilePic"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+        android:layout_toRightOf="@+id/linearLayout"
+        app:border="true"
+        app:border_color="#EEEEEE"
+        app:border_width="1dp"
+        app:shadow="true"
+        android:visibility="gone"
+        android:layout_gravity="end"
+        />
 </RelativeLayout>
-</LinearLayout>

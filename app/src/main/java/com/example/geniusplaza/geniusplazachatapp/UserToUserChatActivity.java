@@ -48,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.RemoteMessage;
+import com.pkmmte.view.CircularImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -65,8 +66,9 @@ public class UserToUserChatActivity extends AppCompatActivity {
     public TextView messageText, messageUser, messageTime;
     public String messageTextInput, currentUserImageUrl, receiverUserImageUrl;
     final int REQUEST_IMAGE_CAPTURE = 100;
-    ImageView messageImage, userProfilePic;
-    RelativeLayout relativeLayout;
+    ImageView messageImage;
+    CircularImageView userProfilePic, receiverProfilepic;
+    LinearLayout linearLayout;
 
     ListView listOfMessages;
 
@@ -174,8 +176,10 @@ public class UserToUserChatActivity extends AppCompatActivity {
                 messageUser = (TextView) v.findViewById(R.id.message_user);
                 messageTime = (TextView) v.findViewById(R.id.message_time);
                 messageImage = (ImageView) v.findViewById(R.id.messageImage);
-                userProfilePic = (ImageView) v.findViewById(R.id.messageProfilePic);
-                relativeLayout = (RelativeLayout) v.findViewById(R.id.relativeLayout);
+                userProfilePic = (CircularImageView) v.findViewById(R.id.messageProfilePic);
+                receiverProfilepic =(CircularImageView)v.findViewById(R.id.messageReceiverProfilePic) ;
+                linearLayout = (LinearLayout) v.findViewById(R.id.linearLayout);
+
                 // Set their text
                 if(model.getImageURL() != null){
                     messageText.setVisibility(View.GONE);
@@ -188,8 +192,9 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageUser.setGravity(Gravity.START);
                         messageTime.setGravity(Gravity.START);
                         messageImage.setScaleType(ImageView.ScaleType.FIT_START);
-                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_blue);
-
+                        linearLayout.setBackgroundResource(R.drawable.rounded_color_blue);
+                        userProfilePic.setVisibility(View.VISIBLE);
+                        receiverProfilepic.setVisibility(View.GONE);
                         byte[] decodedString = Base64.decode(currentUserImageUrl, Base64.DEFAULT);
                         Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                         DisplayMetrics dm = new DisplayMetrics();
@@ -202,14 +207,15 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageUser.setGravity(Gravity.END);
                         messageTime.setGravity(Gravity.END);
                         messageImage.setScaleType(ImageView.ScaleType.FIT_END);
-                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_grey);
-
+                        linearLayout.setBackgroundResource(R.drawable.rounded_color_grey);
+                        userProfilePic.setVisibility(View.GONE);
+                        receiverProfilepic.setVisibility(View.VISIBLE);
                         byte[] decodedString = Base64.decode(receiverUserImageUrl, Base64.DEFAULT);
                         Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                         DisplayMetrics dm = new DisplayMetrics();
                         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-                        userProfilePic.setImageBitmap(bm);
+                        receiverProfilepic.setImageBitmap(bm);
                     }
 
                     // Format the date before showing it
@@ -222,7 +228,7 @@ public class UserToUserChatActivity extends AppCompatActivity {
                     getWindowManager().getDefaultDisplay().getMetrics(dm);
 
                     messageImage.setImageBitmap(bm);
-                    messageText.setVisibility(View.VISIBLE);
+                    //messageText.setVisibility(View.VISIBLE);
                 }
                 else {
                     messageImage.setVisibility(View.GONE);
@@ -238,8 +244,9 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageText.setGravity(Gravity.START);
                         messageUser.setGravity(Gravity.START);
                         messageTime.setGravity(Gravity.START);
-                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_blue);
-
+                        linearLayout.setBackgroundResource(R.drawable.rounded_color_blue);
+                        userProfilePic.setVisibility(View.VISIBLE);
+                        receiverProfilepic.setVisibility(View.GONE);
                         byte[] decodedString = Base64.decode(currentUserImageUrl, Base64.DEFAULT);
                         Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                         DisplayMetrics dm = new DisplayMetrics();
@@ -252,14 +259,14 @@ public class UserToUserChatActivity extends AppCompatActivity {
                         messageText.setGravity(Gravity.END);
                         messageUser.setGravity(Gravity.END);
                         messageTime.setGravity(Gravity.END);
-                        relativeLayout.setBackgroundResource(R.drawable.rounded_color_grey);
-
+                        linearLayout.setBackgroundResource(R.drawable.rounded_color_grey);
+                        userProfilePic.setVisibility(View.GONE);
+                        receiverProfilepic.setVisibility(View.VISIBLE);
                         byte[] decodedString = Base64.decode(receiverUserImageUrl, Base64.DEFAULT);
                         Bitmap bm = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                         DisplayMetrics dm = new DisplayMetrics();
                         getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-                        userProfilePic.setImageBitmap(bm);
+                        receiverProfilepic.setImageBitmap(bm);
                     }
 
                     // Format the date before showing it

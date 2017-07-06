@@ -36,8 +36,10 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class AddFriendActivity extends AppCompatActivity {
     public FirebaseListAdapter<User> adapter,adapterSearch;
@@ -47,7 +49,7 @@ public class AddFriendActivity extends AppCompatActivity {
     public FloatingActionButton addFriendButton, deleteFriendButton;
     public DatabaseReference mDatabaseReference;
     public static boolean userThereInFriendlist = false;
-
+    Map<String,User> removeDuplicate = new HashMap<String, User>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +58,7 @@ public class AddFriendActivity extends AppCompatActivity {
         displayUsers();
         textSearchTerm = (EditText)findViewById(R.id.inputSearchterm);
         final String searchvalue = textSearchTerm.getText().toString();
-        /*textSearchTerm.addTextChangedListener(new TextWatcher() {
+        textSearchTerm.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -64,54 +66,97 @@ public class AddFriendActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                ListView listOfUsersSearch = (ListView)findViewById(R.id.list_of_users);
+
+
+                ListView listOfUsers = (ListView)findViewById(R.id.list_of_users);
 
                 adapterSearch = new FirebaseListAdapter<User>(AddFriendActivity.this, User.class,
                         R.layout.add_friend_row, FirebaseDatabase.getInstance().getReference().child("users")) {
                     @Override
                     protected void populateView(View v, final User model, int position) {
+
+
                         // Get references to the views of message.xml
                         TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                         TextView userName = (TextView)v.findViewById(R.id.name_user);
-                        addFriendButton = (Button) findViewById(R.id.addFriendButton);
+                        addFriendButton = (FloatingActionButton) v.findViewById(R.id.addFriendButton);
+                        deleteFriendButton = (FloatingActionButton) v.findViewById(R.id.deleteFriendButton);
 //                FirebaseMessaging.getInstance().send(RemoteMessage );
-                        Log.d("search",model.email);
-                        Log.d("search term", searchvalue);
-                        if((!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && model.email.contains(textSearchTerm.getText().toString().toLowerCase()) ){
+                        if(!model.email.equalsIgnoreCase(FirebaseAuth.getInstance().getCurrentUser().getEmail()) && model.email.contains(textSearchTerm.getText().toString().toLowerCase())){
                             userEmail.setText(model.email);
                             userName.setText(model.name);
+
+                            addFriendButton.setVisibility(View.VISIBLE);
+                            deleteFriendButton.setVisibility(View.VISIBLE);
                             addFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Log.d("User name: ", model.name);
                                     mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-                                    User user = new User(model.uid, model.email, model.name, model.fireBaseToken);
-                                    mDatabaseReference.child("friends").child(model.uid).setValue(user);
+                                    mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Log.d("the value of snapshot", dataSnapshot.child(model.uid).toString());
+                                            if(dataSnapshot.child(model.uid).exists()){
+                                                addFriendButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_delete));
+                                                Toast.makeText(getApplicationContext(), "Already your friend", Toast.LENGTH_SHORT).show();
+                                            }
+                                            else{
+                                                Log.d("User name: ", model.name);
+                                                addFriendButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_add));
+                                                User user = new User(model.uid, model.email, model.name, model.fireBaseToken, model.aboutMe, model.profileImg);
+                                                mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child(model.uid).setValue(user);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+
+                                }
+                            });
+                            deleteFriendButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                                    mDatabaseReference.child("friends: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Log.d("the value of snapshot", dataSnapshot.child(model.uid).toString());
+                                            if(dataSnapshot.child(model.uid).exists()){
+                                                Log.d("Delete test: ", model.name);
+                                                dataSnapshot.child(model.uid).getRef().setValue(null);
+                                            }
+                                            else{
+                                                Toast.makeText(getApplicationContext(), "Is not your friend", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
                             });
                         }
-                        v.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent i = new Intent(AddFriendActivity.this,UserToUserChatActivity.class);
-                                i.putExtra("userName",model.name);
-                                i.putExtra("email",model.email);
-                                i.putExtra("uid",model.uid);
-                                i.putExtra("token",model.fireBaseToken);
-                                startActivity(i);
-                            }
-                        });
-
+                        else{
+                            addFriendButton.setVisibility(View.GONE);
+                            deleteFriendButton.setVisibility(View.GONE);
+                        }
                     }
                 };
-                listOfUsersSearch.setAdapter(adapterSearch);
+                Log.d("token id:", FirebaseInstanceId.getInstance().getToken());
+                listOfUsers.setAdapter(adapterSearch);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
 
             }
-        });*/
+        });
     }
 
     private void displayUsers() {
@@ -121,6 +166,7 @@ public class AddFriendActivity extends AppCompatActivity {
                 R.layout.add_friend_row, FirebaseDatabase.getInstance().getReference().child("users")) {
             @Override
             protected void populateView(View v, final User model, int position) {
+
                 // Get references to the views of message.xml
                 TextView userEmail = (TextView)v.findViewById(R.id.email_user);
                 TextView userName = (TextView)v.findViewById(R.id.name_user);
@@ -132,7 +178,7 @@ public class AddFriendActivity extends AppCompatActivity {
                     userName.setText(model.name);
 
                     addFriendButton.setVisibility(View.VISIBLE);
-
+                    deleteFriendButton.setVisibility(View.VISIBLE);
                     addFriendButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -186,6 +232,10 @@ public class AddFriendActivity extends AppCompatActivity {
                             });
                         }
                     });
+                }
+                else{
+                    addFriendButton.setVisibility(View.GONE);
+                    deleteFriendButton.setVisibility(View.GONE);
                 }
             }
         };
