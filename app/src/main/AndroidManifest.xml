@@ -3,10 +3,15 @@
     package="com.example.geniusplaza.geniusplazachatapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false"></uses-feature>
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -38,7 +43,8 @@
         </service>
 
         <activity android:name=".AddFriendActivity" />
-        <activity android:name=".UserProfileActivity"></activity>
+        <activity android:name=".UserProfileActivity" />
+        <activity android:name=".CustomerServiceBot.MainActivityBot"></activity>
     </application>
 
 </manifest>

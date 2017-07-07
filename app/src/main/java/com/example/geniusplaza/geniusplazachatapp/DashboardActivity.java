@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.geniusplaza.geniusplazachatapp.CustomerServiceBot.MainActivityBot;
 import com.example.geniusplaza.geniusplazachatapp.POJO.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -179,6 +180,11 @@ public class DashboardActivity extends AppCompatActivity {
 
     public void buttonGoToUserToUserChat(View v) {
         Intent i = new Intent(DashboardActivity.this, UserListActivity.class);
+        startActivity(i);
+    }
+
+    public void customerServiceBotClicked(View v) {
+        Intent i = new Intent(DashboardActivity.this, MainActivityBot.class);
         startActivity(i);
     }
 }
