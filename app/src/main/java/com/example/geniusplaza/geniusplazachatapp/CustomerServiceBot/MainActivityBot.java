@@ -146,7 +146,7 @@ public class MainActivityBot extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-        this.inputMessage.setText("");
+        this.inputMessage.setText("hello");
         this.initialRequest = true;
         sendMessage();
 
