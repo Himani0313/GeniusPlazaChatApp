@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/message_time"
             android:layout_marginTop="5dp"
-            android:visibility="gone" />
+            android:visibility="visible" />
     </LinearLayout>
     <com.pkmmte.view.CircularImageView
         android:id="@+id/messageReceiverProfilePic"

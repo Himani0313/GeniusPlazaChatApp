@@ -1,17 +1,34 @@
 package com.example.geniusplaza.geniusplazachatapp.Tutor;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import com.example.geniusplaza.geniusplazachatapp.R;
 import com.example.geniusplaza.geniusplazachatapp.Tutor.Pojo.Pod;
 import com.example.geniusplaza.geniusplazachatapp.Tutor.Pojo.Query;
 import com.example.geniusplaza.geniusplazachatapp.Tutor.Retrofit.RestClient;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -22,6 +39,7 @@ public class MainActivityTutor extends AppCompatActivity {
     TextView results,definition,headerResult,definitionHeader;
     public EditText queryWord;
     ProgressBar mProgressBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +52,7 @@ public class MainActivityTutor extends AppCompatActivity {
             headerResult = (TextView) findViewById(R.id.resultText);
             mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
             definitionHeader = (TextView) findViewById(R.id.definitionText);
+
         }
 
     public void submitQueryWord (View v){
@@ -70,12 +89,16 @@ public class MainActivityTutor extends AppCompatActivity {
                         definition.setText(i.getSubpods().get(0).getPlaintext().toString());
                     }
 
+
+                    }
+                if(results.getText().equals("Results")&&definition.getText().equals("Definitions")){
+                    Toast.makeText(getApplicationContext(),"No results, Please try rewording the input",Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Toast.makeText(MainActivityTutor.this, "No results, Please try rewording the input", Toast.LENGTH_LONG).show();
             }
 
             @Override

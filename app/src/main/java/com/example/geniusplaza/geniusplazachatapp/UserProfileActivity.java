@@ -97,6 +97,7 @@ public class UserProfileActivity extends AppCompatActivity {
         if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
+
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
